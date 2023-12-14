@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three/build/three.module.js"
+			}
+		}
+	</script>
+	<title>Terrain Texture</title>
+</head>
+<body>
+	
+
+<script type="module"> 
+
+import * as THREE from './orbitControls/three.module.js';
+import {OrbitControls} from './orbitControls/OrbitControls.js';
+
+
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		camera.position.set(17, 15, -19)
+
+		const scene = new THREE.Scene();
+
+		const renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setAnimationLoop( animation );
+		document.body.appendChild( renderer.domElement );
+
+		window.addEventListener('resize', function(){
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+		renderer.setSize(width, height);
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+	});
+
+
+		//Orbit Controls 
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		controls.minDistance = 5;
+		controls.maxDistance = 15;
+
+        // Crear una geometría y un material
+
+		const planeGeometry = new THREE.PlaneGeometry(70, 70);
+		const planeMaterial = new THREE.MeshBasicMaterial({side: true, visible: false});
+		
+		const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+		planeMesh.rotateX(-Math.PI / 2);
+
+
+		const grid = new THREE.GridHelper(100, 100);
+		scene.add(grid, planeMesh);
+
+		const gridGeometry = grid.geometry;
+		const originalPositions = gridGeometry.attributes.position.array.slice();
+
+	// DEFORMAR GRID
+
+		function deformGrid(time) {
+			const factor = 0.3; // Ajusta este factor según tu preferencia de deformación
+			const positions = gridGeometry.attributes.position.array;
+
+			// Modifica las posiciones de los vértices para deformar el GridHelper
+			for (let i = 0; i < positions.length; i += 3) {
+				const x = originalPositions[i];
+				const y = originalPositions[ i+ 1];
+				const z = originalPositions[i + 3];
+
+				// Aplica una deformación sinusoidal en la dirección z
+				positions[i + 1] = y + Math.sin(z * factor + time / 800) * 3;
+			}
+
+			// Actualiza los datos de la geometría
+			gridGeometry.attributes.position.needsUpdate = true;
+		}
+
+		function animation(time){
+		deformGrid(time);
+		renderer.render( scene, camera );
+		}
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

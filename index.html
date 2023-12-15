@@ -40,17 +40,16 @@ import {OrbitControls} from './orbitControls/OrbitControls.js';
 		camera.updateProjectionMatrix();
 	});
 
-
 		//Orbit Controls 
 
 		const controls = new OrbitControls( camera, renderer.domElement );
-		controls.minDistance = 5;
-		controls.maxDistance = 15;
+		controls.minDistance = 25;
+		controls.maxDistance = 5;
 
         // Crear una geometría y un material
 
 		const planeGeometry = new THREE.PlaneGeometry(70, 70);
-		const planeMaterial = new THREE.MeshBasicMaterial({side: true, visible: false});
+		const planeMaterial = new THREE.MeshNormalMaterial({side: false, visible: false});
 		
 		const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 		planeMesh.rotateX(-Math.PI / 2);
@@ -65,20 +64,20 @@ import {OrbitControls} from './orbitControls/OrbitControls.js';
 	// DEFORMAR GRID
 
 		function deformGrid(time) {
-			const factor = 0.3; // Ajusta este factor según tu preferencia de deformación
+			const factor = 1/6; //"Ruido que modifica las ondas"
 			const positions = gridGeometry.attributes.position.array;
 
-			// Modifica las posiciones de los vértices para deformar el GridHelper
+			// Se modifica las posiciones de los vértices para deformar el GridHelper
 			for (let i = 0; i < positions.length; i += 3) {
 				const x = originalPositions[i];
-				const y = originalPositions[ i+ 1];
-				const z = originalPositions[i + 3];
+				const y = originalPositions[1];
+				const z = originalPositions[i + 5];
 
-				// Aplica una deformación sinusoidal en la dirección z
-				positions[i + 1] = y + Math.sin(z * factor + time / 800) * 3;
+				// Se aplica una deformación sinusoidal en la dirección z
+				positions[i + 1] = y + Math.sin(z * factor + time / 500) * 3;
 			}
 
-			// Actualiza los datos de la geometría
+			// Se actualiza los datos de la geometría
 			gridGeometry.attributes.position.needsUpdate = true;
 		}
 
